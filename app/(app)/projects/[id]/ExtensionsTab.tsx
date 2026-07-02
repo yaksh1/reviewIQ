@@ -81,8 +81,9 @@ export default function ExtensionsTab({
     setProgress("");
     setFetching(false);
     if (data.results) {
-      const failed = data.results.filter((x: any) => !x.ok);
-      if (failed.length) setErr(`Some failed: ${failed.map((f: any) => f.ext_id).join(", ")}`);
+      const results = data.results as { ext_id: string; ok: boolean }[];
+      const failed = results.filter((x) => !x.ok);
+      if (failed.length) setErr(`Some failed: ${failed.map((f) => f.ext_id).join(", ")}`);
     }
     await reload();
   }

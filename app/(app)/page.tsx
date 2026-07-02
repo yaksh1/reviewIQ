@@ -45,7 +45,7 @@ export default function Dashboard() {
                 <I size={15} style={{ color: "var(--muted)" }} />
               </div>
               <div className="mono" style={{ fontSize: 30, fontWeight: 500, letterSpacing: "-0.02em", color: "var(--text)" }}>
-                {stats ? (stats as any)[c.key].toLocaleString() : "—"}
+                {stats ? stats[c.key].toLocaleString() : "—"}
               </div>
             </div>
           );

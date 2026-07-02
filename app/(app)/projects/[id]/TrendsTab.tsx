@@ -50,7 +50,6 @@ function Spark({ values, color = "var(--accent)", height = 38 }: { values: (numb
     const y = v == null ? null : height - 4 - ((v - min) / range) * (height - 8);
     return v == null ? null : `${(i * step).toFixed(1)},${y!.toFixed(1)}`;
   }).filter(Boolean) as string[];
-  const last = valid[valid.length - 1];
   return (
     <svg width={w} height={height} style={{ display: "block" }}>
       <polyline points={pts.join(" ")} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />

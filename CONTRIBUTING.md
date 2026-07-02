@@ -18,7 +18,7 @@ By participating you agree to abide by our [Code of Conduct](./CODE_OF_CONDUCT.m
 ## Getting set up
 
 ```bash
-git clone https://github.com/<you>/reviewiq.git
+git clone https://github.com/yaksh1/reviewIQ.git
 cd reviewiq
 npm install
 npx playwright install chromium
