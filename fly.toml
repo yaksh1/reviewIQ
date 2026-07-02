@@ -1,0 +1,33 @@
+# Fly.io config for the single-box deploy (app + Chromium + SQLite).
+# Edit `app` to your chosen name, then: fly launch --no-deploy (first time),
+# fly volume create data --size 1, fly deploy.
+
+app = "reviewiq"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "3000"
+  DATA_DIR = "/data"
+  NODE_ENV = "production"
+
+# Persistent volume so SQLite (data/app.db) survives redeploys.
+[mounts]
+  source = "data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  # Scale to zero when idle → ~$0 cost; wakes on the next request.
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[[vm]]
+  # Chromium needs real memory; 1GB is the safe floor for a scrape.
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1
