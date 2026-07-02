@@ -5,11 +5,12 @@ export const runtime = "nodejs";
 
 export async function GET() {
   const db = getDb();
-  const projects = (db.prepare("SELECT COUNT(*) c FROM projects").get() as any).c;
-  const extensions = (db.prepare("SELECT COUNT(*) c FROM extensions").get() as any).c;
-  const reviews = (db.prepare("SELECT COUNT(*) c FROM reviews").get() as any).c;
-  const analyses = (db.prepare("SELECT COUNT(*) c FROM analyses").get() as any).c;
-  const replies = (db.prepare("SELECT COUNT(*) c FROM review_replies").get() as any).c;
+  const count = (sql: string): number => (db.prepare(sql).get() as { c: number }).c;
+  const projects = count("SELECT COUNT(*) c FROM projects");
+  const extensions = count("SELECT COUNT(*) c FROM extensions");
+  const reviews = count("SELECT COUNT(*) c FROM reviews");
+  const analyses = count("SELECT COUNT(*) c FROM analyses");
+  const replies = count("SELECT COUNT(*) c FROM review_replies");
 
   const recentProjects = db
     .prepare(

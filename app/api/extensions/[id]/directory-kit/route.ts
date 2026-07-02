@@ -50,9 +50,10 @@ export async function POST(
       const w = await scrapeWebsite(websiteUrl);
       website = { url: w.url, title: w.title, metaDescription: w.metaDescription, text: w.text };
       db.prepare("UPDATE extensions SET website = ? WHERE id = ?").run(w.url, ext.id);
-    } catch (e: any) {
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
       return NextResponse.json(
-        { error: `Could not load that website: ${e.message}` },
+        { error: `Could not load that website: ${msg}` },
         { status: 400 }
       );
     }

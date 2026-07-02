@@ -44,8 +44,8 @@ export async function POST(
     return NextResponse.json(
       db.prepare("SELECT * FROM extensions WHERE id = ?").get(info.lastInsertRowid)
     );
-  } catch (e: any) {
-    if (String(e.message).includes("UNIQUE"))
+  } catch (e) {
+    if (e instanceof Error && e.message.includes("UNIQUE"))
       return NextResponse.json(
         { error: "That extension is already in this project." },
         { status: 409 }

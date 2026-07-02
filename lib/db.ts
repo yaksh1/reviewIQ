@@ -10,7 +10,6 @@ const DB_PATH = path.join(DATA_DIR, "app.db");
 
 // Single connection reused across hot reloads in dev.
 declare global {
-  // eslint-disable-next-line no-var
   var __db: Database.Database | undefined;
 }
 

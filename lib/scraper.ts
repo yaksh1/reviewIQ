@@ -230,7 +230,7 @@ export async function scrapeExtension(
     }
 
     const reviews: ScrapedReview[] = await page.evaluate(() => {
-      const out: any[] = [];
+      const out: { review_uid: string; author: string; rating: number | null; body: string; date: string }[] = [];
       const cards = Array.from(document.querySelectorAll(".T7rvce"));
       for (const card of cards) {
         const header = card.querySelector(".U47jjf");

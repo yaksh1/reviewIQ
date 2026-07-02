@@ -166,7 +166,8 @@ function runClaudeCli(prompt: string, timeoutMs: number): Promise<string> {
     child.on("error", (e) => { clearTimeout(timer); reject(e); });
     child.on("close", (code) => {
       clearTimeout(timer);
-      code !== 0 ? reject(new Error(`claude exited ${code}: ${err || out}`)) : resolve(out.trim());
+      if (code !== 0) reject(new Error(`claude exited ${code}: ${err || out}`));
+      else resolve(out.trim());
     });
     child.stdin.write(prompt);
     child.stdin.end();
@@ -195,8 +196,8 @@ async function runAnthropic(cfg: ProviderConfig, prompt: string, timeoutMs: numb
       signal: ctrl.signal,
     });
     if (!res.ok) throw new Error(`Anthropic ${res.status}: ${(await res.text()).slice(0, 300)}`);
-    const data = await res.json();
-    return (data.content?.map((b: any) => b.text).join("") || "").trim();
+    const data = (await res.json()) as { content?: { text?: string }[] };
+    return (data.content?.map((b) => b.text ?? "").join("") || "").trim();
   } finally {
     clearTimeout(t);
   }
@@ -248,7 +249,7 @@ export async function runLLM(
     case "openai-compatible":
       return runOpenAICompatible(cfg, prompt, timeoutMs);
     default:
-      throw new Error(`Unknown provider kind: ${(cfg as any).kind}`);
+      throw new Error(`Unknown provider kind: ${(cfg as ProviderConfig).kind}`);
   }
 }
 
