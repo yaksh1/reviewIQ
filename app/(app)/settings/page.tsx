@@ -5,6 +5,7 @@ import { PageHeader, Spinner } from "@/components/ui";
 import { Icon } from "@/components/icons";
 import PublicProfileCard from "@/components/PublicProfileCard";
 import ScheduleCard from "@/components/ScheduleCard";
+import DigestCard from "@/components/DigestCard";
 import MetricsCard from "@/components/MetricsCard";
 import ExtMetaCard from "@/components/ExtMetaCard";
 
@@ -343,6 +344,9 @@ export default function SettingsPage() {
 
       {/* Automatic re-scrape scheduler */}
       <ScheduleCard />
+
+      {/* Digest delivery (webhook / email) after each scheduled scan */}
+      <DigestCard />
 
       {/* Private metrics: Google Analytics + manual Web Store numbers */}
       <MetricsCard />

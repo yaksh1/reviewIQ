@@ -242,6 +242,124 @@ export function saveSchedule(input: Partial<ScheduleConfig>): ScheduleConfig {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Digest delivery — where scheduled "what changed" digests are sent         */
+/* -------------------------------------------------------------------------- */
+
+const DIGEST_KEY = "digest_config";
+
+export type DigestChannel = "none" | "webhook" | "email";
+
+/** What we persist. Secrets (webhook URL, email API key) are encrypted. */
+interface StoredDigest {
+  enabled: boolean;
+  channel: DigestChannel;
+  onlyWhenChanged: boolean; // skip sending if nothing moved
+  webhookUrlEnc?: string; // encrypted (Slack/Discord/generic incoming webhook)
+  emailApiKeyEnc?: string; // encrypted (Resend API key)
+  emailFrom?: string; // non-secret
+  emailTo?: string; // non-secret
+}
+
+/** Masked view for the UI. Never returns the raw secrets. */
+export interface DigestConfigView {
+  enabled: boolean;
+  channel: DigestChannel;
+  onlyWhenChanged: boolean;
+  hasWebhookUrl: boolean;
+  hasEmailKey: boolean;
+  emailFrom: string;
+  emailTo: string;
+}
+
+/** Fully-resolved config (decrypted). Server-only. */
+export interface DigestConfig {
+  enabled: boolean;
+  channel: DigestChannel;
+  onlyWhenChanged: boolean;
+  webhookUrl: string;
+  emailApiKey: string;
+  emailFrom: string;
+  emailTo: string;
+}
+
+function readDigest(): StoredDigest {
+  const row = getDb().prepare("SELECT value FROM settings WHERE key = ?").get(DIGEST_KEY) as
+    | { value: string }
+    | undefined;
+  if (!row) return { enabled: false, channel: "none", onlyWhenChanged: true };
+  try {
+    return JSON.parse(row.value) as StoredDigest;
+  } catch {
+    return { enabled: false, channel: "none", onlyWhenChanged: true };
+  }
+}
+
+export function getDigestConfigView(): DigestConfigView {
+  const s = readDigest();
+  return {
+    enabled: !!s.enabled,
+    channel: s.channel || "none",
+    onlyWhenChanged: s.onlyWhenChanged !== false,
+    hasWebhookUrl: !!s.webhookUrlEnc,
+    hasEmailKey: !!s.emailApiKeyEnc,
+    emailFrom: s.emailFrom || "",
+    emailTo: s.emailTo || "",
+  };
+}
+
+export function getDigestConfig(): DigestConfig {
+  const s = readDigest();
+  return {
+    enabled: !!s.enabled,
+    channel: s.channel || "none",
+    onlyWhenChanged: s.onlyWhenChanged !== false,
+    webhookUrl: s.webhookUrlEnc ? decryptSecret(s.webhookUrlEnc) : "",
+    emailApiKey: s.emailApiKeyEnc ? decryptSecret(s.emailApiKeyEnc) : "",
+    emailFrom: s.emailFrom || "",
+    emailTo: s.emailTo || "",
+  };
+}
+
+/**
+ * Save digest config. Secret fields (`webhookUrl`, `emailApiKey`) follow the
+ * usual keep/clear/set convention: undefined = keep, "" = clear, string = set.
+ */
+export function saveDigestConfig(input: {
+  enabled?: boolean;
+  channel?: DigestChannel;
+  onlyWhenChanged?: boolean;
+  webhookUrl?: string;
+  emailApiKey?: string;
+  emailFrom?: string;
+  emailTo?: string;
+}): DigestConfigView {
+  const prev = readDigest();
+  const next: StoredDigest = { ...prev };
+
+  if (input.enabled !== undefined) next.enabled = !!input.enabled;
+  if (input.channel !== undefined) next.channel = input.channel;
+  if (input.onlyWhenChanged !== undefined) next.onlyWhenChanged = !!input.onlyWhenChanged;
+  if (input.emailFrom !== undefined) next.emailFrom = input.emailFrom.trim();
+  if (input.emailTo !== undefined) next.emailTo = input.emailTo.trim();
+
+  const setSecret = (val: string | undefined, cur: string | undefined): string | undefined => {
+    if (val === undefined) return cur; // keep
+    if (val === "") return undefined; // clear
+    return encryptSecret(val);
+  };
+  next.webhookUrlEnc = setSecret(input.webhookUrl, prev.webhookUrlEnc);
+  next.emailApiKeyEnc = setSecret(input.emailApiKey, prev.emailApiKeyEnc);
+
+  getDb()
+    .prepare(
+      `INSERT INTO settings (key, value) VALUES (?, ?)
+       ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = datetime('now')`
+    )
+    .run(DIGEST_KEY, JSON.stringify(next));
+  return getDigestConfigView();
+}
+
+/* -------------------------------------------------------------------------- */
 /* Google Analytics — service-account key + per-extension property mapping    */
 /* -------------------------------------------------------------------------- */
 
