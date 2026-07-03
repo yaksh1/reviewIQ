@@ -14,6 +14,8 @@ Self-hostable · runs on your own machine · your data and API keys never leave 
 
 </div>
 
+![ReviewIQ Insights — AI sentiment & theme comparison of your extension vs competitors](docs/screenshots/insights.png)
+
 ---
 
 ## Table of contents
@@ -68,17 +70,22 @@ You bring the AI:
 | 🗺️ | **Roadmap** | Prioritized, buildable backlog from your complaints, your strengths, and competitor gaps — with evidence quotes. |
 | 📝 | **Page Ideas** | 10 SEO landing/blog page ideas grounded in real review demand. |
 | 📦 | **Directory Kit** | Copy-paste submission playbook (Product Hunt, BetaList, …) grounded in your site + listing. |
+| 🔔 | **Digests** | Scheduled re-scrapes email/webhook you a "what changed" digest — rating moves, new complaints & praises. |
 | ⚙️ | **Settings** | Switch AI provider, paste a key (encrypted), test the connection — no code changes. |
 
 ---
 
 ## Screenshots
 
-> _Add screenshots to `docs/screenshots/` and reference them here._
+**Dashboard** — everything you track at a glance.
 
-| Dashboard | Insights | Roadmap |
-|---|---|---|
-| _coming soon_ | _coming soon_ | _coming soon_ |
+![Dashboard](docs/screenshots/dashboard.png)
+
+**Roadmap** — Claude turns your complaints, your strengths, and competitor gaps into a prioritized, buildable backlog with evidence quotes.
+
+![Roadmap](docs/screenshots/roadmap.png)
+
+_(Insights shown at the top.)_
 
 ---
 
@@ -210,13 +217,19 @@ Dockerfile, fly.toml  Single-box deploy
 
 ## 🗺️ Roadmap
 
-- [ ] Multi-tenant accounts (auth) + Postgres option alongside SQLite
-- [ ] Scheduled re-scrapes + trend digests
-- [ ] Cloud scraping path (worker + queue) for hosted scale
+- [x] Scheduled re-scrapes + trend digests (webhook / email)
 - [ ] Export (CSV / Markdown) across all tabs
 - [ ] More providers / model presets
+- [ ] Multi-tenant accounts + Postgres (for a hosted option)
+- [ ] Cloud scraping path (worker + queue) for hosted scale
 
 Have an idea? [Open an issue](../../issues).
+
+### ☁️ A hosted version?
+
+ReviewIQ is free to self-host, forever. I'm considering a **managed/hosted tier** for people
+who'd rather not run it themselves — always-on scheduled scans, digests, and zero setup.
+**If you'd use that, ⭐ star the repo** — it's how I'll gauge whether to build it. No email needed.
 
 ---
 
