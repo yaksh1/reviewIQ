@@ -231,6 +231,13 @@ ReviewIQ is **free to self-host, forever.** A **managed/hosted tier** is in the 
 you sign into (no setup), with always-on monitoring and Slack/email alerts. It's the same open-source
 core, run for you, so you don't have to babysit a server or a headless browser.
 
+**Ship, then get pinged when something needs you** — without watching the Web Store:
+
+- 📉 **Email me when my rating drops** (or crosses a threshold), so I catch a bad release early.
+- 🆕 **Email me when a new complaint theme appears** — a fresh bug or gap I haven't seen yet.
+- 🏆 **Alert me when a competitor's rating tanks or their users revolt** — my opening to win switchers.
+- 📈 **Weekly digest of what moved** — new reviews, rising praises/complaints, install trend, all in one email.
+
 **Why hosted, if the code is free?** Self-hosting is great for a one-off analysis or if you live in the
 terminal. But keeping it running *well* is real work — and that's what the hosted tier removes:
 
