@@ -1,5 +1,6 @@
 import { fetchAllProjects } from "./fetch-project";
 import { getSchedule } from "./settings";
+import { deliverDigests } from "./notify";
 
 /*
   In-process re-scrape scheduler (single-box model). A setInterval ticks every
@@ -19,6 +20,7 @@ interface SchedulerState {
   nextRun: string | null; // ISO
   lastResult: { projects: number; ok: number; failed: number } | null;
   lastError: string | null;
+  lastDigest: { channel: string; sent: number; skipped: boolean; error?: string } | null;
 }
 
 declare global {
@@ -34,6 +36,7 @@ function state(): SchedulerState {
       nextRun: null,
       lastResult: null,
       lastError: null,
+      lastDigest: null,
     };
   }
   return globalThis.__scheduler;
@@ -53,6 +56,16 @@ export async function runScrapeNow(): Promise<void> {
     const failed = results.reduce((n, p) => n + p.results.filter((r) => !r.ok).length, 0);
     s.lastResult = { projects: results.length, ok, failed };
     s.lastRun = new Date().toISOString();
+
+    // Deliver a "what changed" digest after the scrape. Fresh snapshots exist
+    // now, so the digest reflects this run. Delivery is a no-op unless a channel
+    // is configured; never let a delivery failure fail the scrape.
+    try {
+      const d = await deliverDigests();
+      s.lastDigest = { channel: d.channel, sent: d.sent, skipped: d.skipped, error: d.error };
+    } catch (e) {
+      s.lastDigest = { channel: "?", sent: 0, skipped: false, error: e instanceof Error ? e.message : String(e) };
+    }
   } catch (e) {
     s.lastError = e instanceof Error ? e.message : String(e);
   } finally {
@@ -107,6 +120,7 @@ export interface SchedulerStatus {
   nextRun: string | null;
   lastResult: SchedulerState["lastResult"];
   lastError: string | null;
+  lastDigest: SchedulerState["lastDigest"];
 }
 
 export function schedulerStatus(): SchedulerStatus {
@@ -120,5 +134,6 @@ export function schedulerStatus(): SchedulerStatus {
     nextRun: cfg.enabled ? s.nextRun : null,
     lastResult: s.lastResult,
     lastError: s.lastError,
+    lastDigest: s.lastDigest,
   };
 }
