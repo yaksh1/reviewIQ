@@ -146,6 +146,7 @@ function ExtCard({ s }: { s: Series }) {
 export default function TrendsTab({ projectId }: { projectId: string }) {
   const [series, setSeries] = useState<Series[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -153,6 +154,18 @@ export default function TrendsTab({ projectId }: { projectId: string }) {
       .then((r) => r.json())
       .then((d) => { setSeries(d.series); setLoading(false); });
   }, [projectId]);
+
+  async function copyDigest() {
+    const d = await fetch(`/api/projects/${projectId}/digest`).then((r) => r.json()).catch(() => null);
+    if (!d?.text || !navigator.clipboard) return;
+    try {
+      await navigator.clipboard.writeText(d.text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // clipboard blocked (permissions / insecure context) — leave the label unchanged
+    }
+  }
 
   if (loading)
     return <div style={{ display: "flex", justifyContent: "center", padding: 60 }}><Spinner size={24} /></div>;
@@ -165,9 +178,15 @@ export default function TrendsTab({ projectId }: { projectId: string }) {
 
   return (
     <div className="fade-in">
-      <p className="muted" style={{ fontSize: 13.5, margin: "0 0 16px", maxWidth: 620 }}>
-        A snapshot is captured on every fetch. Theme & sentiment trends fill in when you run <strong style={{ color: "var(--text)" }}>Insights</strong>. {totalSnaps} snapshot{totalSnaps !== 1 ? "s" : ""} so far — refetch periodically to build history.
-      </p>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, margin: "0 0 16px" }}>
+        <p className="muted" style={{ fontSize: 13.5, maxWidth: 620, margin: 0 }}>
+          A snapshot is captured on every fetch. Theme & sentiment trends fill in when you run <strong style={{ color: "var(--text)" }}>Insights</strong>. {totalSnaps} snapshot{totalSnaps !== 1 ? "s" : ""} so far — refetch periodically to build history.
+        </p>
+        <button className="btn btn-sm" onClick={copyDigest} title="Copy a text digest of what changed since the last snapshot">
+          {copied ? <Icon.check size={14} /> : <Icon.copy size={14} />}
+          <span style={{ marginLeft: 6 }}>{copied ? "Copied" : "Copy digest"}</span>
+        </button>
+      </div>
       <div style={{ display: "grid", gap: 16 }}>
         {withData.map((s) => <ExtCard key={s.extension_id} s={s} />)}
       </div>
