@@ -225,11 +225,26 @@ Dockerfile, fly.toml  Single-box deploy
 
 Have an idea? [Open an issue](../../issues).
 
-### ☁️ A hosted version?
+### ☁️ Hosted version — coming soon
 
-ReviewIQ is free to self-host, forever. I'm considering a **managed/hosted tier** for people
-who'd rather not run it themselves — always-on scheduled scans, digests, and zero setup.
-**If you'd use that, ⭐ star the repo** — it's how I'll gauge whether to build it. No email needed.
+ReviewIQ is **free to self-host, forever.** A **managed/hosted tier** is in the works — a live app
+you sign into (no setup), with always-on monitoring and Slack/email alerts. It's the same open-source
+core, run for you, so you don't have to babysit a server or a headless browser.
+
+**Why hosted, if the code is free?** Self-hosting is great for a one-off analysis or if you live in the
+terminal. But keeping it running *well* is real work — and that's what the hosted tier removes:
+
+| | Self-host (free) | Hosted (coming) |
+|---|---|---|
+| **Scheduled scans run…** | only while your machine/server is on (a laptop can't cron) | **24/7 in the cloud**, even when you're offline |
+| **Scraper (Chromium) ops** | you manage ~1GB+ RAM, crashes, version drift, broken selectors | **fully managed** — you never see a browser error |
+| **Alerts** | webhook / email you configure yourself (bring your own SMTP/Resend key) | **Slack + email digests** out of the box, nothing to configure |
+| **AI key** | bring your own (get a key, paste it, pay per-token) | **managed** — no key juggling, one price |
+| **Setup** | clone → install → Playwright → deploy | **sign up → paste an extension ID → done in 60s** |
+| **Updates** | `git pull` + redeploy yourself | **always current** |
+| **Data** | in your `data/app.db` (your box) | managed, backed up |
+
+**If you'd use the hosted version, ⭐ star the repo** — it's how I'll decide whether to build it. No email needed.
 
 ---
 
