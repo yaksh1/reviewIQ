@@ -3,11 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { PageHeader, Spinner } from "@/components/ui";
 import { Icon } from "@/components/icons";
-import PublicProfileCard from "@/components/PublicProfileCard";
 import ScheduleCard from "@/components/ScheduleCard";
 import DigestCard from "@/components/DigestCard";
 import MetricsCard from "@/components/MetricsCard";
-import ExtMetaCard from "@/components/ExtMetaCard";
 
 type ProviderKind = "claude-cli" | "anthropic" | "openai-compatible";
 
@@ -350,12 +348,6 @@ export default function SettingsPage() {
 
       {/* Private metrics: Google Analytics + manual Web Store numbers */}
       <MetricsCard />
-
-      {/* Public "build in public" profile */}
-      <PublicProfileCard />
-
-      {/* Per-app public badges */}
-      <ExtMetaCard />
     </div>
   );
 }
