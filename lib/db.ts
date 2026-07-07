@@ -1,6 +1,14 @@
 import Database from "better-sqlite3";
 import path from "path";
 import fs from "fs";
+import { assertStorageConfig } from "./db-config";
+
+/*
+  Storage: single-file SQLite (better-sqlite3). This is the self-host default and
+  the only implemented backend today. The backend choice lives in lib/db-config;
+  getDb() is the single branch point where a future Postgres adapter would hook
+  in. Keeping that decision in one place is the groundwork for the hosted tier.
+*/
 
 // DATA_DIR is the mounted volume in production (e.g. /data on Fly), or ./data locally.
 const DATA_DIR = process.env.DATA_DIR || path.join(process.cwd(), "data");
@@ -167,8 +175,21 @@ function init(db: Database.Database) {
   }
 }
 
+/**
+ * The database handle. Single branch point for the storage backend.
+ *
+ * Today this always returns the SQLite connection. `assertStorageConfig()`
+ * throws first if the environment selects an unimplemented/dangerous backend
+ * (e.g. hosted mode without DATABASE_URL, or DATABASE_URL set before the
+ * Postgres adapter exists), so we never silently open the wrong store.
+ *
+ * When the Postgres adapter lands, it branches here on getStorageBackend().
+ */
 export function getDb(): Database.Database {
   if (!global.__db) {
+    // Fail fast on a dangerous storage misconfiguration. After this, the backend
+    // is guaranteed "sqlite" (assert throws for postgres/hosted-without-url).
+    assertStorageConfig();
     const db = new Database(DB_PATH);
     init(db);
     global.__db = db;
